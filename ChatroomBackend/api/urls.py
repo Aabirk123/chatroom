@@ -1,6 +1,7 @@
 from django.urls import path, include
-from .views import ping
+from .views import ViewRooms, MessageView
 
 urlpatterns = [
-    path('test/', ping)
+    path('rooms/', ViewRooms.as_view(), name='RoomList'),
+    path('create-message/',MessageView.as_view(), name="CreateMessage")
 ]

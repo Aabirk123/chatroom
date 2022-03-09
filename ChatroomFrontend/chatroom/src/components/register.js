@@ -11,6 +11,8 @@ import Link from "@material-ui/core/Link";
 import Grid from "@material-ui/core/Grid";
 import { Typography, makeStyles, Container, ThemeProvider } from '@material-ui/core';
 import { GridOnRounded, RestaurantRounded } from '@material-ui/icons';
+import axiosIntance from '../Axios'
+
 
 const useStyles = makeStyles((theme) => ({
     paper:{
@@ -33,6 +35,7 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 export default function SignUp(){
+
     const navigate = useNavigate();
     const intialFormData = Object.freeze({
         email:'',
@@ -69,12 +72,21 @@ export default function SignUp(){
     const handleSubmit = (e) => {
         e.preventDefault();
         validateForm();
-        if(hasErrorData.error){
-            console.log("rejected")
-        }
-        else{
-            console.log("accepted")
-        }
+        if(!hasErrorData.error){
+            axiosIntance
+            .post(`user/register/`, {
+                email:formData.email,
+                username:formData.username,
+                password:formData.password
+            })
+            .then((res)=>{
+                navigate('/')
+                console.log(res.data);
+            })
+            .catch((e) =>{
+                console.log(e);
+            })
+        };
 
     }
 

@@ -5,6 +5,8 @@ import HomePage from './components/home';
 import React from 'react';
 import Header from './components/header';
 import SignUp from './components/register';
+import SignIn from './components/login';
+import SignOut from './components/logout';
 
 function App() {
   return (
@@ -14,6 +16,8 @@ function App() {
         <Routes>
           <Route path='/' element={<HomePage/>}/>
           <Route path='/register' element={<SignUp/>}/>
+          <Route path='/login' element={<SignIn/>}/>
+          <Route path='/logout' element={<SignOut/>}/>
         </Routes>
       </Router>
     </React.Fragment>
