@@ -1,3 +1,4 @@
+from time import time
 from django.db import models
 from django.dispatch import receiver
 from django.utils  import timezone
@@ -19,9 +20,13 @@ class Message(models.Model):
     sender = models.ForeignKey(User, on_delete=models.CASCADE)
     room = models.ForeignKey(Room, on_delete=models.CASCADE)
     content = models.TextField(max_length=3000, blank=False)
+    sent = models.DateTimeField(default=timezone.now)
 
     def __str__(self):
-        return self.sender.username + " " + self.id
+        return self.sender.username + " " + str(self.room.id) + " " + str(self.id)
+
+    class Meta:
+        ordering = ['sent']
 
 
 @receiver(m2m_changed, sender=Room)

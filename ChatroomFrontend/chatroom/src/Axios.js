@@ -3,17 +3,19 @@ import Cookies from 'js-cookie';
 
 const baseUrl = 'http://127.0.0.1:7000/api/'
 
+
 const axiosInstance = axios.create({
     baseURL: baseUrl,
     timeout:5000,
     headers: {
        Authorization: Cookies.get('access_token') ?
-       'JWT ' + Cookies.get('access_token') :
-       null,
+       'JWT ' + Cookies.get('access_token'):
+       null, 
        'Content-Type':'application/json',
        accept:'application/json'
     },
 })
+
 
 axiosInstance.interceptors.response.use(
     (response) => {
@@ -22,30 +24,33 @@ axiosInstance.interceptors.response.use(
     async function (error){
         const orignalRequest = error.config;
 
+
         if(typeof error.response === 'undefined'){
             alert ("Network connection issues");
             return Promise.reject(error);
         }
 
-        if(error.response.status === 401 && orignalRequest.url === baseUrl + 'token/refresh'){
+        if(error.response.status === 401 && !Cookies.get('access_token')){
             window.location.href = '/login/';
+            window.location.reload();
             return Promise.reject(error);
         }
 
         if(error.response.data.code === "token_not_valid" && error.response.status === 401 && error.response.statusText === 'Unauthorized'){
             const refreshToken = Cookies.get('refresh_token');
 
+
             if(refreshToken){
                 const tokenParts = JSON.parse(atob(refreshToken.split('.')[1]));
                 const now = Math.ceil(Date.now()/ 1000);
 
                 if(tokenParts.exp > now){
-                    return axiosInstance('/token/refresh/', {refresh: refreshToken})
+                    return axiosInstance.post('/token/refresh/', {refresh: refreshToken})
                     .then((response) =>{
                         Cookies.set('access_token', response.data.access);
                         axiosInstance.defaults.headers["Authorization"] = 
                         'JWT ' + response.data.access;
-                        orignalRequest.headers["Auhtorization"] = 
+                        orignalRequest.headers["Authorization"] = 
                         'JWT ' + response.data.access;
 
                         return axiosInstance(orignalRequest);
@@ -55,7 +60,10 @@ axiosInstance.interceptors.response.use(
                     })
                 }
                 else {
+                    Cookies.remove('access_token');
+                    Cookies.remove('refresh_token');
                     window.location.href = '/login/';
+                    window.location.reload()
                 }
             }
             else{

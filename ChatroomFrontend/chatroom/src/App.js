@@ -7,6 +7,7 @@ import Header from './components/header';
 import SignUp from './components/register';
 import SignIn from './components/login';
 import SignOut from './components/logout';
+import GetRoom from './components/room';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path='/register' element={<SignUp/>}/>
           <Route path='/login' element={<SignIn/>}/>
           <Route path='/logout' element={<SignOut/>}/>
+          <Route path='room/:roomid' element={<GetRoom/>}/>
         </Routes>
       </Router>
     </React.Fragment>

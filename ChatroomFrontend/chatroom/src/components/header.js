@@ -9,6 +9,9 @@ import { Drawer } from "@material-ui/core";
 import ClearIcon from '@material-ui/icons/Clear';
 import Grid from "@material-ui/core/Grid";
 import { Container } from "@material-ui/core";
+import HomeIcon from '@material-ui/icons/Home';
+import axiosInstance from "../Axios";
+import Link from "@material-ui/core/Link"
 
 const useStyles = makeStyles((theme) => ({
     appBar:{
@@ -28,10 +31,20 @@ export default function Header(){
     const classes = useStyles();
 
     const [drawerState, setDrawerState] = useState(false);
+    const [roomsData, setRoomData] = useState({rooms:[]})
 
 
-    const handleDrawer = () =>{
-        drawerState ? setDrawerState(false) : setDrawerState(true);
+    const handleDrawer = async () =>{
+
+        if(drawerState){
+            setDrawerState(false);
+        }
+        else{
+            const rooms = await axiosInstance.get('rooms/')
+            setRoomData({rooms:rooms.data})
+            setDrawerState(true);
+            
+        }
     }
 
 
@@ -102,26 +115,29 @@ export default function Header(){
                         open={drawerState}
                         anchor="left"
                     >
-                        <Container>
-                            <Grid container spacing={3} style={{flexDirection:'column'}}>
+                        <Container maxWidth="xs" >
+                            <CssBaseline/>
+                            <Grid container spacing={3}>
                                 <Grid item>
-                                    <IconButton onClick={handleDrawer}>
-                                        <ClearIcon/>    
-                                    </IconButton> 
-                                </Grid>
-                                <Grid item xs={12}>
-                                    hello
-                                </Grid>
-                                <Grid item xs={12}>
-                                    whatever
+                                    <div style={{display:"flex", justifyContent:'flex-end'}}>
+                                        <IconButton onClick={handleDrawer}>
+                                            <ClearIcon/>    
+                                        </IconButton>
+                                    </div> 
                                 </Grid>
                             </Grid>
+                            {roomsData.rooms.map((room)=>{
+                                return (<Grid key={room.id} style={{textDecoration:"none"}}item component={NavLink} to="/">        
+                                        <Typography style={{padding:"0.5rem", color:"black"}} variant="h5">{room.title}</Typography>
+                                        <Typography style={{padding:"0.5rem", color:"black"}}>{room.last_message}</Typography>
+                                </Grid>)
+                            })}
                         </Container>
                     </Drawer>
                     <nav style={{flexGrow:1}}>
-                        <Typography style={{margin:"1rem", color:"white"}} component={NavLink} to="/">
-                                Chatter
-                        </Typography>
+                        <IconButton component={NavLink} to="/"> 
+                            <HomeIcon style={{color:"white"}}></HomeIcon>
+                        </IconButton>
                     </nav>
                     {Cookies.get('access_token') ? <SignedInButtons/> : <SignedOutButtons/>}
                 </Toolbar>
